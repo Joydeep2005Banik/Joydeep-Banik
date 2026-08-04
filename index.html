@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>joydeep@portfolio — CLI Dashboard</title>
+  <meta name="description" content="Joydeep Banik's developer portfolio — a terminal-inspired CLI dashboard showcasing projects in ML, backend infrastructure, and RAG pipelines." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <div class="viewport">
+    <div class="terminal" id="terminal">
+      <!-- Title Bar -->
+      <div class="titlebar">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-amber"></span>
+        <span class="dot dot-green"></span>
+        <span class="titlebar-text">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          joydeep@portfolio: ~/careergraph
+        </span>
+      </div>
+
+      <!-- KPI Bar -->
+      <div class="kpibar" id="kpibar">
+        <span class="kpi"><span class="kpi-label">UPTIME:</span> <span class="kpi-val emerald" id="uptime">0h 0m 0s</span></span>
+        <span class="kpi"><span class="kpi-label">CGPA:</span> <span class="kpi-val emerald">6.77</span></span>
+        <span class="kpi"><span class="kpi-label">PROJECTS:</span> <span class="kpi-val emerald" id="proj-count">4 active</span></span>
+        <span class="kpi"><span class="kpi-label">FOCUS:</span> <span class="sparkline cyan" id="focus-spark"></span> <span class="kpi-val cyan">RAG/backend</span></span>
+        <span class="kpi"><span class="kpi-label">HONORS:</span> <span class="kpi-val emerald">3</span></span>
+        <span class="kpi kpi-clock"><span class="kpi-val muted" id="clock">00:00:00</span></span>
+      </div>
+
+      <!-- Main Panels -->
+      <div class="panels">
+        <!-- Left Panel -->
+        <div class="panel-left">
+          <div class="section-header">projects — ↑↓ navigate · enter select</div>
+          <ul class="project-list" id="project-list"></ul>
+
+          <div class="section-header">selected — detail</div>
+          <div class="detail-pane" id="detail-pane"></div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="panel-right">
+          <div class="section-header">
+            <span>metrics</span>
+            <span class="hint">r refresh</span>
+          </div>
+          <div class="metrics-grid" id="metrics-grid"></div>
+
+          <div class="section-header clickable" id="ai-toggle-header">
+            <span class="ai-label">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+              ai insight
+            </span>
+            <span class="hint">a toggle</span>
+          </div>
+          <div class="ai-insight" id="ai-insight"></div>
+
+          <div class="section-header">activity log</div>
+          <div class="log-pane" id="log-pane"></div>
+        </div>
+      </div>
+
+      <!-- Command Bar -->
+      <div class="cmdbar" id="cmdbar">
+        <span class="cmd"><kbd>↑↓</kbd> navigate</span>
+        <span class="cmd"><kbd>ENTER</kbd> select</span>
+        <span class="cmd"><kbd>R</kbd> refresh</span>
+        <span class="cmd"><kbd>A</kbd> toggle ai</span>
+        <span class="cmd"><kbd>C</kbd> contact</span>
+        <span class="cmd"><kbd>Q</kbd> resume</span>
+      </div>
+
+      <!-- Contact Modal -->
+      <div class="modal-overlay" id="contact-modal">
+        <div class="modal">
+          <div class="modal-titlebar">
+            <span>contact — joydeep banik</span>
+            <span class="hint">ESC close</span>
+          </div>
+          <div class="modal-body">
+            <div class="modal-row"><span class="kpi-label">Email:</span> <a href="mailto:joydeepbanik2005@gmail.com" class="link">joydeepbanik2005@gmail.com</a></div>
+            <div class="modal-row"><span class="kpi-label">GitHub:</span> <a href="https://github.com/Joydeep2005Banik" target="_blank" rel="noopener" class="link">Joydeep2005Banik</a></div>
+            <div class="modal-row"><span class="kpi-label">LinkedIn:</span> <a href="https://linkedin.com/in/joydeep-banik" target="_blank" rel="noopener" class="link">joydeep-banik</a></div>
+            <div class="modal-row"><span class="kpi-label">Location:</span> <span class="emerald">Kolkata, India</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resume Modal -->
+      <div class="modal-overlay" id="resume-modal">
+        <div class="modal modal-wide">
+          <div class="modal-titlebar">
+            <span>resume.txt — joydeep banik</span>
+            <span class="hint">ESC close</span>
+          </div>
+          <div class="modal-body resume-body" id="resume-body">
+            <pre class="resume-content">
+┌─────────────────────────────────────────────────┐
+│              JOYDEEP BANIK                      │
+│    B.Tech CSE · Jadavpur University Salt Lake   │
+│    CGPA: 6.77 · Batch 2027                      │
+└─────────────────────────────────────────────────┘
+
+─── EXPERIENCE ───────────────────────────────────
+
+  ▸ Haldia Petrochemicals Ltd — IT Intern
+    Role-based OOP inventory management system
+    Unit-tested, production-grade Python
+
+  ▸ Research Project — Jadavpur University
+    Video dehazing via RAG pipeline
+    Latent-space residual transformation
+
+─── HONORS ───────────────────────────────────────
+
+  ✦ India Innovates — Finalist
+    Bharat Mandapam, New Delhi
+
+  ✦ Smart India Hackathon — Semi-finalist
+    AgriSense satellite pipeline
+
+  ✦ Swami Vivekananda Merit Scholarship
+    2024, 2025
+
+─── SKILLS ───────────────────────────────────────
+
+  Languages   Python · JavaScript · C · SQL
+  ML/AI       PyTorch · RAG · CNN · K-Means
+  Infra       Kubernetes · Kafka · Docker · SSH
+  Data        Neo4j · VectorDB · GEE
+  Tools       Git · Linux · Textual · FastAPI
+
+─── ACTIVITIES ───────────────────────────────────
+
+  ▸ Amplify CTF — Full-stack CTF infrastructure
+    Scoring logic, live monitoring
+
+  ▸ RCC Talkies — Research Wing
+    Feature articles on emerging tech
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
