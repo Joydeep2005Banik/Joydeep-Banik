@@ -78,12 +78,15 @@ const METRICS = [
   { label: "Hackathon results",    value: "2",                 type: "text" },
 ];
 
+const GITHUB_USERNAME = "Joydeep2005Banik";
+
 /* ── State ────────────────────────────────────────── */
 let selectedIndex = 2; // default: sovereign-bharat
 let aiVisible = true;
 let uptimeSeconds = 0;
 let contactOpen = false;
 let resumeOpen = false;
+let gitData = null; // populated after fetch
 
 /* ── DOM Refs ─────────────────────────────────────── */
 const $ = (id) => document.getElementById(id);
@@ -99,6 +102,9 @@ const focusSpark    = $("focus-spark");
 const contactModal  = $("contact-modal");
 const resumeModal   = $("resume-modal");
 const cmdbar        = $("cmdbar");
+const gitHeatmapEl  = $("git-heatmap");
+const gitRecentEl   = $("git-recent");
+const gitStatusEl   = $("git-status");
 
 /* ── Helpers ──────────────────────────────────────── */
 function buildSparkline(pct, colorClass) {
@@ -185,6 +191,229 @@ function renderMetrics() {
     <div class="metric-label">${m.label}</div>
     <div class="metric-value">${m.type === "spark" ? buildSparkline(m.pct, m.color) : m.value}</div>
   `).join("");
+}
+
+/* ── GitHub: Fetch & Process ──────────────────────── */
+async function fetchGitHubActivity() {
+  gitStatusEl.textContent = "fetching…";
+  gitHeatmapEl.innerHTML = '<div class="git-loading">▌ loading commit history…</div>';
+
+  try {
+    // 1. Fetch all public repos
+    const reposRes = await fetch(
+      `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=pushed`
+    );
+    if (!reposRes.ok) throw new Error(`GitHub API ${reposRes.status}`);
+    const repos = await reposRes.json();
+
+    // 2. For each repo, fetch commits from the last 90 days
+    const since = new Date();
+    since.setDate(since.getDate() - 84); // 12 weeks
+    const sinceISO = since.toISOString();
+
+    const commits = [];
+    const dailyCounts = {};
+    const repoCounts = {};
+
+    // Fetch commits in parallel (limit to 15 most recently pushed repos to avoid rate limits)
+    const recentRepos = repos.slice(0, 15);
+    const commitFetches = recentRepos.map(async (repo) => {
+      try {
+        const res = await fetch(
+          `https://api.github.com/repos/${GITHUB_USERNAME}/${repo.name}/commits?author=${GITHUB_USERNAME}&since=${sinceISO}&per_page=100`
+        );
+        if (!res.ok) return; // skip repos we can't read (forks with no commits, etc.)
+        const repoCommits = await res.json();
+        if (!Array.isArray(repoCommits)) return;
+
+        repoCommits.forEach((c) => {
+          const date = c.commit.author.date.split("T")[0];
+          const msg = c.commit.message.split("\n")[0];
+          commits.push({
+            msg,
+            repo: repo.name,
+            date,
+            time: c.commit.author.date,
+            sha: c.sha.slice(0, 7),
+          });
+          dailyCounts[date] = (dailyCounts[date] || 0) + 1;
+          repoCounts[repo.name] = (repoCounts[repo.name] || 0) + 1;
+        });
+      } catch (_) {
+        // silently skip repos that error
+      }
+    });
+
+    await Promise.all(commitFetches);
+
+    // Sort commits by time descending
+    commits.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+    // Build 12-week (84-day) daily map
+    const today = new Date();
+    const days = [];
+    for (let i = 83; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split("T")[0];
+      const dayOfWeek = d.getDay();
+      days.push({ date: key, count: dailyCounts[key] || 0, dow: dayOfWeek });
+    }
+
+    // Stats
+    const totalCommits = commits.length;
+    const mostActiveRepo = Object.entries(repoCounts).sort((a, b) => b[1] - a[1])[0];
+    const lastPush = commits.length > 0 ? commits[0].date : "—";
+
+    // Current streak
+    let streak = 0;
+    for (let i = 0; i < 84; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split("T")[0];
+      if (dailyCounts[key] && dailyCounts[key] > 0) streak++;
+      else break;
+    }
+
+    gitData = {
+      days,
+      commits: commits.slice(0, 8),
+      totalCommits,
+      mostActiveRepo: mostActiveRepo ? mostActiveRepo[0] : "—",
+      mostActiveCount: mostActiveRepo ? mostActiveRepo[1] : 0,
+      lastPush,
+      streak,
+    };
+
+    renderGitHeatmap();
+    renderGitRecent();
+    gitStatusEl.textContent = `${totalCommits} commits`;
+
+    // Log it
+    LOG_SEED.push({
+      t: nowTimeStr(),
+      lvl: "OK",
+      msg: `github-sync: fetched ${totalCommits} commits across ${Object.keys(repoCounts).length} repos from ${GITHUB_USERNAME}`,
+    });
+    renderLogs();
+
+  } catch (err) {
+    gitStatusEl.textContent = "error";
+    gitHeatmapEl.innerHTML = `<div class="git-error">⚠ ${err.message} — rate limit or network issue</div>`;
+    LOG_SEED.push({
+      t: nowTimeStr(),
+      lvl: "WARN",
+      msg: `github-sync: fetch failed — ${err.message}`,
+    });
+    renderLogs();
+  }
+}
+
+/* ── Render: Git Heatmap ─────────────────────────── */
+function renderGitHeatmap() {
+  if (!gitData) return;
+  const { days, totalCommits, mostActiveRepo, mostActiveCount, lastPush, streak } = gitData;
+
+  // Find max for intensity scaling
+  const maxCount = Math.max(1, ...days.map((d) => d.count));
+
+  function cellLevel(count) {
+    if (count === 0) return 0;
+    const ratio = count / maxCount;
+    if (ratio <= 0.25) return 1;
+    if (ratio <= 0.5)  return 2;
+    if (ratio <= 0.75) return 3;
+    return 4;
+  }
+
+  // Group into weeks (columns)
+  const weeks = [];
+  let currentWeek = [];
+  days.forEach((d, i) => {
+    currentWeek.push(d);
+    if (d.dow === 6 || i === days.length - 1) {
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+  });
+
+  // Stats row
+  const statsHtml = `
+    <div class="heatmap-stats">
+      <span class="stat-label">Total commits</span>
+      <span class="stat-value">${totalCommits}</span>
+      <span class="stat-label">Current streak</span>
+      <span class="stat-value">${streak}d</span>
+      <span class="stat-label">Most active</span>
+      <span class="stat-value">${mostActiveRepo}</span>
+      <span class="stat-label">Last push</span>
+      <span class="stat-value">${lastPush}</span>
+    </div>
+  `;
+
+  // Heatmap grid
+  const gridHtml = weeks.map((week) => {
+    const cells = week.map(
+      (d) => `<div class="heatmap-cell level-${cellLevel(d.count)}" title="${d.date}: ${d.count} commits"></div>`
+    ).join("");
+    return `<div class="heatmap-week">${cells}</div>`;
+  }).join("");
+
+  // Legend
+  const legendHtml = `
+    <div class="heatmap-legend">
+      less
+      <div class="heatmap-cell level-0"></div>
+      <div class="heatmap-cell level-1"></div>
+      <div class="heatmap-cell level-2"></div>
+      <div class="heatmap-cell level-3"></div>
+      <div class="heatmap-cell level-4"></div>
+      more · 12 weeks
+    </div>
+  `;
+
+  gitHeatmapEl.innerHTML = statsHtml + `<div class="heatmap-grid">${gridHtml}</div>` + legendHtml;
+}
+
+/* ── Render: Git Recent Commits ──────────────────── */
+function renderGitRecent() {
+  if (!gitData || gitData.commits.length === 0) {
+    gitRecentEl.innerHTML = '';
+    return;
+  }
+
+  const rows = gitData.commits.map((c, i) => {
+    const timeAgo = formatTimeAgo(c.time);
+    return `
+      <div class="git-commit-row" style="animation-delay: ${i * 0.06}s">
+        <span class="commit-time">${timeAgo}</span>
+        <span class="commit-repo">${c.repo}</span>
+        <span class="commit-msg">${escapeHtml(c.msg)}</span>
+      </div>
+    `;
+  }).join("");
+
+  gitRecentEl.innerHTML = `
+    <div class="git-recent-title">recent commits</div>
+    ${rows}
+  `;
+}
+
+/* ── Helpers: Time Ago & Escape ───────────────────── */
+function formatTimeAgo(isoStr) {
+  const diff = Date.now() - new Date(isoStr).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 60)  return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 /* ── Render: AI Insight ───────────────────────────── */
@@ -393,6 +622,9 @@ function boot() {
   renderLogs();
   renderFocusSpark();
   tickClock();
+
+  // Fetch GitHub commit history
+  fetchGitHubActivity();
 
   // Timers
   setInterval(tickClock, 1000);
