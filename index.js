@@ -141,6 +141,7 @@ let projIdx    = 0;
 let expIdx     = 0;
 let focus      = "projects";   // "projects" | "experience"
 let modalOpen  = false;
+let contactOpen = false;
 let gitData    = null;
 
 /* ═══════════════════════════════════════════════════
@@ -156,8 +157,9 @@ const expDetEl    = $("experience-detail");
 const gitEl       = $("git-heatmap");
 const gitStatEl   = $("git-status");
 const clockEl     = $("clock");
-const resumeModal = $("resume-modal");
-const cmdbar      = $("cmdbar");
+const resumeModal  = $("resume-modal");
+const contactModal = $("contact-modal");
+const cmdbar       = $("cmdbar");
 
 const paneProjList = $("pane-proj-list");
 const paneExpList  = $("pane-exp-list");
@@ -262,14 +264,44 @@ function syncFocus() {
 }
 
 /* ═══════════════════════════════════════════════════
-   GITHUB FETCH (Repos + Commits API)
+   GITHUB FETCH (Repos + Commits API) — cached 1h
    ═══════════════════════════════════════════════════ */
-async function fetchGit() {
+const GIT_CACHE_KEY = "portfolio_git_cache";
+const GIT_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+function loadCachedGit() {
+  try {
+    const raw = localStorage.getItem(GIT_CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (Date.now() - cached.ts > GIT_CACHE_TTL) return null;
+    return cached.data;
+  } catch (_) { return null; }
+}
+
+function saveCacheGit(data) {
+  try {
+    localStorage.setItem(GIT_CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch (_) {}
+}
+
+async function fetchGit(forceRefresh = false) {
+  // Try cache first
+  if (!forceRefresh) {
+    const cached = loadCachedGit();
+    if (cached) {
+      gitData = cached;
+      renderHeatmap();
+      gitStatEl.textContent = `${cached.total} commits · cached`;
+      return;
+    }
+  }
+
   gitStatEl.textContent = "fetching…";
   gitEl.innerHTML = '<div class="git-loading">▌ loading commit history…</div>';
   try {
     const rRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=pushed`);
-    if (!rRes.ok) throw new Error(`API ${rRes.status}`);
+    if (!rRes.ok) throw new Error(`API ${rRes.status} — rate limit hit, try again later`);
     const repos = await rRes.json();
 
     const since = new Date(); since.setDate(since.getDate() - 84);
@@ -307,10 +339,21 @@ async function fetchGit() {
 
     const last = total > 0 ? days.filter(d => d.count).pop()?.date || "—" : "—";
     gitData = { days, total, streak, last };
+    saveCacheGit(gitData);
     renderHeatmap();
     gitStatEl.textContent = `${total} commits · 12 weeks`;
   } catch (err) {
-    gitStatEl.textContent = "error";
+    // Fall back to stale cache if available
+    try {
+      const raw = localStorage.getItem(GIT_CACHE_KEY);
+      if (raw) {
+        gitData = JSON.parse(raw).data;
+        renderHeatmap();
+        gitStatEl.textContent = `${gitData.total} commits · stale cache`;
+        return;
+      }
+    } catch (_) {}
+    gitStatEl.textContent = "rate limited";
     gitEl.innerHTML = `<div class="git-error">⚠ ${err.message}</div>`;
   }
 }
@@ -353,9 +396,11 @@ function tickClock() { clockEl.textContent = now(); }
 /* ═══════════════════════════════════════════════════
    MODAL
    ═══════════════════════════════════════════════════ */
-function toggleModal() { modalOpen = !modalOpen; resumeModal.classList.toggle("visible", modalOpen); }
-function closeModal()  { modalOpen = false; resumeModal.classList.remove("visible"); }
-resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModal(); });
+function toggleModal()   { modalOpen = !modalOpen; resumeModal.classList.toggle("visible", modalOpen); if (modalOpen) { contactOpen = false; contactModal.classList.remove("visible"); } }
+function toggleContact() { contactOpen = !contactOpen; contactModal.classList.toggle("visible", contactOpen); if (contactOpen) { modalOpen = false; resumeModal.classList.remove("visible"); } }
+function closeModals()   { modalOpen = false; contactOpen = false; resumeModal.classList.remove("visible"); contactModal.classList.remove("visible"); }
+resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModals(); });
+contactModal.addEventListener("click", e => { if (e.target === contactModal) closeModals(); });
 
 /* ═══════════════════════════════════════════════════
    CMD BAR FLASH
@@ -374,8 +419,8 @@ function flash(key) {
    KEYBOARD
    ═══════════════════════════════════════════════════ */
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") { closeModal(); return; }
-  if (modalOpen) return;
+  if (e.key === "Escape") { closeModals(); return; }
+  if (modalOpen || contactOpen) return;
 
   switch (e.key.toLowerCase()) {
     case "tab":
@@ -411,7 +456,9 @@ document.addEventListener("keydown", e => {
       flash("↑↓"); break;
 
     case "r":
-      e.preventDefault(); fetchGit(); flash("R"); break;
+      e.preventDefault(); fetchGit(true); flash("R"); break;
+    case "c":
+      e.preventDefault(); toggleContact(); flash("C"); break;
     case "q":
       e.preventDefault(); toggleModal(); flash("Q"); break;
   }
