@@ -9,10 +9,10 @@ const ABOUT = {
   title: "B.Tech CSE · Jadavpur University Salt Lake · Batch 2027",
   bio: "Backend-leaning CS undergrad building at the intersection of infrastructure, applied ML, and retrieval-augmented systems. Most at home in Python, terminal UIs, and pipeline architecture.",
   links: [
-    { label: "GitHub",   url: "https://github.com/Joydeep2005Banik",  text: "Joydeep2005Banik" },
-    { label: "Email",    url: "mailto:joydeepbanik2005@gmail.com",     text: "joydeepbanik2005@gmail.com" },
+    { label: "GitHub", url: "https://github.com/Joydeep2005Banik", text: "Joydeep2005Banik" },
+    { label: "Email", url: "mailto:joydeepbanik2005@gmail.com", text: "joydeepbanik2005@gmail.com" },
     { label: "LinkedIn", url: "https://linkedin.com/in/joydeep-banik", text: "joydeep-banik" },
-    { label: "Location", url: null,                                    text: "Kolkata, India" },
+    { label: "Location", url: null, text: "Kolkata, India" },
   ],
   specs: ["Python", "PyTorch", "RAG", "Kubernetes", "Kafka", "Neo4j", "Docker", "FastAPI"],
 };
@@ -137,31 +137,31 @@ const EXPERIENCES = [
 /* ═══════════════════════════════════════════════════
    STATE
    ═══════════════════════════════════════════════════ */
-let projIdx    = 0;
-let expIdx     = 0;
-let focus      = "projects";   // "projects" | "experience"
-let modalOpen  = false;
-let gitData    = null;
+let projIdx = 0;
+let expIdx = 0;
+let focus = "projects";   // "projects" | "experience"
+let modalOpen = false;
+let gitData = null;
 
 /* ═══════════════════════════════════════════════════
    DOM
    ═══════════════════════════════════════════════════ */
 const $ = (id) => document.getElementById(id);
 
-const aboutEl      = $("about-content");
-const projListEl   = $("project-list");
-const projDetEl    = $("project-detail");
-const expListEl    = $("experience-list");
-const expDetEl     = $("experience-detail");
-const gitEl        = $("git-heatmap");
-const gitStatEl    = $("git-status");
-const clockEl      = $("clock");
-const resumeModal  = $("resume-modal");
+const aboutEl = $("about-content");
+const projListEl = $("project-list");
+const projDetEl = $("project-detail");
+const expListEl = $("experience-list");
+const expDetEl = $("experience-detail");
+const gitEl = $("git-heatmap");
+const gitStatEl = $("git-status");
+const clockEl = $("clock");
+const resumeModal = $("resume-modal");
 const contactModal = $("contact-modal");
-const cmdbar       = $("cmdbar");
+const cmdbar = $("cmdbar");
 
 const paneProjList = $("pane-proj-list");
-const paneExpList  = $("pane-exp-list");
+const paneExpList = $("pane-exp-list");
 
 /* ═══════════════════════════════════════════════════
    HELPERS
@@ -262,130 +262,141 @@ function syncFocus() {
   paneExpList.classList.toggle("focused", focus === "experience");
 }
 
+/* ═══════════════════════════════════════════════════
+   GITHUB FETCH (jogruber.de API)
+   ═══════════════════════════════════════════════════ */
 const GH_CACHE_KEY = "ghCache";
-const GH_CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours in ms
+const GH_CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
 
 async function fetchGit(force = false) {
-  // 1. Try localStorage cache first
+  const graphYear = new Date().getFullYear();
+
   if (!force) {
     try {
       const raw = localStorage.getItem(GH_CACHE_KEY);
       if (raw) {
         const cached = JSON.parse(raw);
-        const age = Date.now() - cached.ts;
-        if (age < GH_CACHE_TTL && cached.daily && cached.total != null) {
-          applyGitData(cached.daily, cached.total);
-          const mins = Math.floor(age / 60000);
-          gitStatEl.textContent = `${cached.total} commits · cached ${mins < 60 ? mins + "m" : Math.floor(mins / 60) + "h"} ago`;
+        if (Date.now() - cached.ts < GH_CACHE_TTL && cached.data?.contributions && cached.year === graphYear) {
+          gitData = cached.data;
+          renderHeatmap(graphYear);
           return;
         }
       }
-    } catch (_) { /* corrupt cache, continue to fetch */ }
+    } catch (_) { }
   }
 
-  // 2. Fetch from GitHub API
   gitStatEl.textContent = "fetching…";
   gitEl.innerHTML = '<div class="git-loading">▌ loading commit history…</div>';
+
   try {
-    const rRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=pushed`);
-    if (!rRes.ok) throw new Error(`API ${rRes.status}`);
-    const repos = await rRes.json();
+    const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=${graphYear}`);
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
 
-    const since = new Date(); since.setDate(since.getDate() - 84);
-    const sinceISO = since.toISOString();
-    const daily = {};
-    let total = 0;
-
-    await Promise.all(repos.slice(0, 15).map(async repo => {
-      try {
-        const r = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${repo.name}/commits?author=${GITHUB_USERNAME}&since=${sinceISO}&per_page=100`);
-        if (!r.ok) return;
-        const cs = await r.json();
-        if (!Array.isArray(cs)) return;
-        cs.forEach(c => {
-          const d = c.commit.author.date.split("T")[0];
-          daily[d] = (daily[d] || 0) + 1;
-          total++;
-        });
-      } catch (_) {}
-    }));
-
-    // 3. Save to localStorage
     try {
-      localStorage.setItem(GH_CACHE_KEY, JSON.stringify({ daily, total, ts: Date.now() }));
-    } catch (_) { /* storage full or unavailable */ }
+      localStorage.setItem(GH_CACHE_KEY, JSON.stringify({ data, year: graphYear, ts: Date.now() }));
+    } catch (_) { }
 
-    applyGitData(daily, total);
-    gitStatEl.textContent = `${total} commits · 12 weeks`;
+    gitData = data;
+    renderHeatmap(graphYear);
 
   } catch (err) {
-    // 4. On error, try to fall back to stale cache
     try {
       const raw = localStorage.getItem(GH_CACHE_KEY);
       if (raw) {
         const cached = JSON.parse(raw);
-        if (cached.daily && cached.total != null) {
-          applyGitData(cached.daily, cached.total);
-          const age = Math.floor((Date.now() - cached.ts) / 60000);
-          gitStatEl.textContent = `${cached.total} commits · stale cache (${age < 60 ? age + "m" : Math.floor(age / 60) + "h"})`;
+        if (cached.data?.contributions) {
+          gitData = cached.data;
+          renderHeatmap(cached.year);
+          gitStatEl.textContent = "stale cache";
           return;
         }
       }
-    } catch (_) {}
+    } catch (_) { }
     gitStatEl.textContent = "error";
     gitEl.innerHTML = `<div class="git-error">⚠ ${err.message} — try again later</div>`;
   }
 }
 
-/* Build gitData from daily counts and render */
-function applyGitData(daily, total) {
-  const today = new Date();
-  const days = [];
-  for (let i = 83; i >= 0; i--) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    const k = d.toISOString().split("T")[0];
-    days.push({ date: k, count: daily[k] || 0, dow: d.getDay() });
-  }
-
-  let streak = 0;
-  for (let i = 0; i < 84; i++) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    if (daily[d.toISOString().split("T")[0]]) streak++; else break;
-  }
-
-  const last = total > 0 ? days.filter(d => d.count).pop()?.date || "—" : "—";
-  gitData = { days, total, streak, last };
-  renderHeatmap();
-}
-
 /* ═══════════════════════════════════════════════════
    RENDER — HEATMAP
    ═══════════════════════════════════════════════════ */
-function renderHeatmap() {
-  if (!gitData) return;
-  const { days, total, streak, last } = gitData;
-  const mx = Math.max(1, ...days.map(d => d.count));
-  const lvl = c => c === 0 ? 0 : c / mx <= .25 ? 1 : c / mx <= .5 ? 2 : c / mx <= .75 ? 3 : 4;
+function renderHeatmap(graphYear) {
+  if (!gitData || !gitData.contributions) return;
 
-  const weeks = []; let wk = [];
-  days.forEach((d, i) => { wk.push(d); if (d.dow === 6 || i === days.length - 1) { weeks.push(wk); wk = []; } });
+  const total = gitData.total?.[graphYear] ?? "—";
+  gitStatEl.textContent = `${total} commits in ${graphYear}`;
+
+  const LEVEL_COLORS = ["var(--zinc-800)", "#0e4429", "#006d32", "#26a641", "#39d353"];
+  const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const WEEKDAY_ROWS = [
+    { row: 1, label: "Mon" },
+    { row: 3, label: "Wed" },
+    { row: 5, label: "Fri" },
+  ];
+
+  const byDate = new Map(gitData.contributions.map((d) => [d.date, d]));
+  const jan1 = new Date(graphYear, 0, 1);
+  const dec31 = new Date(graphYear, 11, 31);
+  const start = new Date(jan1);
+  start.setDate(start.getDate() - start.getDay()); // back up to Sunday
+  const end = new Date(dec31);
+  end.setDate(end.getDate() + (6 - end.getDay())); // forward to Saturday
+
+  const days = [];
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const iso = new Date(d).toISOString().slice(0, 10);
+    const entry = byDate.get(iso);
+    const inYear = d.getFullYear() === graphYear;
+    days.push({
+      date: iso,
+      count: entry?.count ?? 0,
+      level: inYear ? entry?.level ?? 0 : null,
+      monthStart: inYear && d.getDate() === 1 ? d.getMonth() : null,
+    });
+  }
+
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
+
+  const monthLabels = weeks.map((week) => {
+    const hit = week.find((d) => d.monthStart !== null);
+    return hit ? MONTH_NAMES[hit.monthStart] : "";
+  });
 
   gitEl.innerHTML = `
-    <div class="hm-stats">
-      <span class="sl">Total commits</span><span class="sv">${total}</span>
-      <span class="sl">Current streak</span><span class="sv">${streak}d</span>
-      <span class="sl">Last push</span><span class="sv">${last}</span>
+    <div class="hm-wrapper">
+      <div class="hm-header">
+        <div class="hm-months">
+          <div style="width:18px;flex-shrink:0;"></div>
+          ${monthLabels.map(m => `<div class="hm-month">${m}</div>`).join("")}
+        </div>
+      </div>
+      <div class="hm-body">
+        <div class="hm-weekdays">
+          ${Array.from({ length: 7 }).map((_, r) => {
+    const w = WEEKDAY_ROWS.find(w => w.row === r);
+    return `<div class="hm-weekday">${w ? w.label : ""}</div>`;
+  }).join("")}
+        </div>
+        <div class="hm-grid">
+          ${weeks.map(week => `
+            <div class="hm-week">
+              ${week.map(day => day.level === null
+    ? `<div class="hm-cell" style="background:transparent;box-shadow:none"></div>`
+    : `<div class="hm-cell l${day.level}" title="${day.date}: ${day.count} commits" style="background:${LEVEL_COLORS[day.level]}"></div>`
+  ).join("")}
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      <div class="hm-footer">
+        Less
+        ${LEVEL_COLORS.map(c => `<div class="hm-cell" style="background:${c}"></div>`).join("")}
+        More · 
+      </div>
     </div>
-    <div class="hm-grid">${weeks.map(w =>
-      `<div class="hm-week">${w.map(d =>
-        `<div class="hm-cell l${lvl(d.count)}" title="${d.date}: ${d.count} commits"></div>`
-      ).join("")}</div>`
-    ).join("")}</div>
-    <div class="hm-legend">less
-      <div class="hm-cell l0"></div><div class="hm-cell l1"></div>
-      <div class="hm-cell l2"></div><div class="hm-cell l3"></div>
-      <div class="hm-cell l4"></div>more · 12 weeks
-    </div>`;
+  `;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -396,18 +407,18 @@ function tickClock() { clockEl.textContent = now(); }
 /* ═══════════════════════════════════════════════════
    MODAL
    ═══════════════════════════════════════════════════ */
-function toggleResume() { 
-  modalOpen = !modalOpen; 
-  resumeModal.classList.toggle("visible", modalOpen); 
+function toggleResume() {
+  modalOpen = !modalOpen;
+  resumeModal.classList.toggle("visible", modalOpen);
 }
-function toggleContact() { 
-  modalOpen = !modalOpen; 
-  contactModal.classList.toggle("visible", modalOpen); 
+function toggleContact() {
+  modalOpen = !modalOpen;
+  contactModal.classList.toggle("visible", modalOpen);
 }
-function closeModal() { 
-  modalOpen = false; 
-  resumeModal.classList.remove("visible"); 
-  contactModal.classList.remove("visible"); 
+function closeModal() {
+  modalOpen = false;
+  resumeModal.classList.remove("visible");
+  contactModal.classList.remove("visible");
 }
 resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModal(); });
 contactModal.addEventListener("click", e => { if (e.target === contactModal) closeModal(); });
@@ -480,7 +491,7 @@ document.addEventListener("keydown", e => {
 document.addEventListener("DOMContentLoaded", () => {
   renderAbout();
   renderProjList(); renderProjDet();
-  renderExpList();  renderExpDet();
+  renderExpList(); renderExpDet();
   syncFocus();
   tickClock(); setInterval(tickClock, 1000);
   fetchGit();

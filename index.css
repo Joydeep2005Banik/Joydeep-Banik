@@ -170,27 +170,27 @@ body::after{
 .detail-bullets li::before{content:'▸';position:absolute;left:0;color:var(--emerald-500)}
 
 /* ═══ Git Heatmap ════════════════════════════════ */
-.git-area{padding:10px 12px;font-size:var(--text-sm);overflow-y:auto;flex:1;min-height:0}
-
-.hm-stats{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;margin-bottom:8px;font-size:var(--text-xs)}
-.hm-stats .sl{color:var(--zinc-500)}
-.hm-stats .sv{text-align:right;color:var(--emerald-300)}
-
-.hm-grid{display:flex;gap:2px;flex-wrap:wrap}
-.hm-week{display:flex;flex-direction:column;gap:2px}
+.git-area{padding:10px 12px;font-size:var(--text-sm);overflow-y:hidden;overflow-x:auto;flex:1;min-height:0}
+.hm-wrapper{display:flex;flex-direction:column;width:max-content}
+.hm-header{display:flex;margin-bottom:4px}
+.hm-months{display:flex;gap:3px;align-items:flex-end}
+.hm-month{width:10px;font-size:9px;color:var(--zinc-500);line-height:1}
+.hm-body{display:flex}
+.hm-weekdays{display:flex;flex-direction:column;gap:3px;margin-right:6px;padding-top:1px}
+.hm-weekday{height:10px;font-size:9px;color:var(--zinc-500);line-height:1}
+.hm-grid{display:flex;gap:3px}
+.hm-week{display:flex;flex-direction:column;gap:3px}
 .hm-cell{
   width:10px;height:10px;border-radius:2px;
   transition:transform .15s,box-shadow .15s;position:relative;
 }
 .hm-cell:hover{transform:scale(1.6);z-index:2}
-.hm-cell.l0{background:var(--zinc-800)}
-.hm-cell.l1{background:#064e3b;box-shadow:0 0 3px rgba(16,185,129,.15)}
-.hm-cell.l2{background:#047857;box-shadow:0 0 4px rgba(16,185,129,.25)}
-.hm-cell.l3{background:#059669;box-shadow:0 0 5px rgba(16,185,129,.35)}
-.hm-cell.l4{background:var(--emerald-400);box-shadow:0 0 6px rgba(52,211,153,.45)}
+.hm-cell.l1{box-shadow:0 0 3px rgba(16,185,129,.15)}
+.hm-cell.l2{box-shadow:0 0 4px rgba(16,185,129,.25)}
+.hm-cell.l3{box-shadow:0 0 5px rgba(16,185,129,.35)}
+.hm-cell.l4{box-shadow:0 0 6px rgba(52,211,153,.45)}
 
-.hm-legend{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:10px;color:var(--zinc-600)}
-.hm-legend .hm-cell{width:8px;height:8px}
+.hm-footer{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:9px;color:var(--zinc-600);justify-content:flex-end}
 
 .git-loading{color:var(--zinc-600);font-size:var(--text-xs);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
