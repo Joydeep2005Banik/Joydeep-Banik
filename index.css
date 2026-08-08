@@ -127,8 +127,8 @@ body::after{
 .about-bio{color:var(--zinc-400);font-size:var(--text-xs);line-height:1.6;margin-top:6px}
 
 /* ═══ Skills ═════════════════════════════════════ */
-.skill-row{display:flex;gap:10px;padding:2px 0;font-size:var(--text-xs);line-height:1.6}
-.skill-cat{color:var(--zinc-500);min-width:72px;flex-shrink:0;text-align:right}
+.skill-row{display:flex;gap:10px;padding:2px 0 2px 12px;font-size:var(--text-xs);line-height:1.6}
+.skill-cat{color:var(--zinc-500);min-width:110px;flex-shrink:0;text-align:left}
 .skill-items{color:var(--emerald-300)}
 
 /* ═══ Selectable Lists ═══════════════════════════ */
