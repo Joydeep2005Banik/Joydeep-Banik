@@ -176,10 +176,10 @@ body::after{
 .hm-stats .sl{color:var(--zinc-500)}
 .hm-stats .sv{text-align:right;color:var(--emerald-300)}
 
-.hm-grid{display:flex;gap:3px;width:100%}
-.hm-week{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.hm-grid{display:flex;gap:2px;flex-wrap:wrap}
+.hm-week{display:flex;flex-direction:column;gap:2px}
 .hm-cell{
-  width:100%;height:12px;border-radius:2px;
+  width:10px;height:10px;border-radius:2px;
   transition:transform .15s,box-shadow .15s;position:relative;
 }
 .hm-cell:hover{transform:scale(1.6);z-index:2}
@@ -195,10 +195,6 @@ body::after{
 .git-loading{color:var(--zinc-600);font-size:var(--text-xs);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 .git-error{color:var(--amber-400);font-size:var(--text-xs)}
-
-/* modal rows */
-.modal-row{margin-bottom:6px;font-size:var(--text-sm)}
-.modal-row .label{color:var(--zinc-500);margin-right:4px}
 
 /* ═══ Command Bar ════════════════════════════════ */
 .cmdbar{

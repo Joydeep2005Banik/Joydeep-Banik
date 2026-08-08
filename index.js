@@ -141,7 +141,6 @@ let projIdx    = 0;
 let expIdx     = 0;
 let focus      = "projects";   // "projects" | "experience"
 let modalOpen  = false;
-let contactOpen = false;
 let gitData    = null;
 
 /* ═══════════════════════════════════════════════════
@@ -157,9 +156,8 @@ const expDetEl    = $("experience-detail");
 const gitEl       = $("git-heatmap");
 const gitStatEl   = $("git-status");
 const clockEl     = $("clock");
-const resumeModal  = $("resume-modal");
-const contactModal = $("contact-modal");
-const cmdbar       = $("cmdbar");
+const resumeModal = $("resume-modal");
+const cmdbar      = $("cmdbar");
 
 const paneProjList = $("pane-proj-list");
 const paneExpList  = $("pane-exp-list");
@@ -263,45 +261,33 @@ function syncFocus() {
   paneExpList.classList.toggle("focused", focus === "experience");
 }
 
-/* ═══════════════════════════════════════════════════
-   GITHUB FETCH (Repos + Commits API) — cached 1h
-   ═══════════════════════════════════════════════════ */
-const GIT_CACHE_KEY = "portfolio_git_cache";
-const GIT_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const GH_CACHE_KEY = "ghCache";
+const GH_CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours in ms
 
-function loadCachedGit() {
-  try {
-    const raw = localStorage.getItem(GIT_CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw);
-    if (Date.now() - cached.ts > GIT_CACHE_TTL) return null;
-    return cached.data;
-  } catch (_) { return null; }
-}
-
-function saveCacheGit(data) {
-  try {
-    localStorage.setItem(GIT_CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
-  } catch (_) {}
-}
-
-async function fetchGit(forceRefresh = false) {
-  // Try cache first
-  if (!forceRefresh) {
-    const cached = loadCachedGit();
-    if (cached) {
-      gitData = cached;
-      renderHeatmap();
-      gitStatEl.textContent = `${cached.total} commits · cached`;
-      return;
-    }
+async function fetchGit(force = false) {
+  // 1. Try localStorage cache first
+  if (!force) {
+    try {
+      const raw = localStorage.getItem(GH_CACHE_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        const age = Date.now() - cached.ts;
+        if (age < GH_CACHE_TTL && cached.daily && cached.total != null) {
+          applyGitData(cached.daily, cached.total);
+          const mins = Math.floor(age / 60000);
+          gitStatEl.textContent = `${cached.total} commits · cached ${mins < 60 ? mins + "m" : Math.floor(mins / 60) + "h"} ago`;
+          return;
+        }
+      }
+    } catch (_) { /* corrupt cache, continue to fetch */ }
   }
 
+  // 2. Fetch from GitHub API
   gitStatEl.textContent = "fetching…";
   gitEl.innerHTML = '<div class="git-loading">▌ loading commit history…</div>';
   try {
     const rRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=pushed`);
-    if (!rRes.ok) throw new Error(`API ${rRes.status} — rate limit hit, try again later`);
+    if (!rRes.ok) throw new Error(`API ${rRes.status}`);
     const repos = await rRes.json();
 
     const since = new Date(); since.setDate(since.getDate() - 84);
@@ -323,39 +309,52 @@ async function fetchGit(forceRefresh = false) {
       } catch (_) {}
     }));
 
-    const today = new Date();
-    const days = [];
-    for (let i = 83; i >= 0; i--) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
-      const k = d.toISOString().split("T")[0];
-      days.push({ date: k, count: daily[k] || 0, dow: d.getDay() });
-    }
-
-    let streak = 0;
-    for (let i = 0; i < 84; i++) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
-      if (daily[d.toISOString().split("T")[0]]) streak++; else break;
-    }
-
-    const last = total > 0 ? days.filter(d => d.count).pop()?.date || "—" : "—";
-    gitData = { days, total, streak, last };
-    saveCacheGit(gitData);
-    renderHeatmap();
-    gitStatEl.textContent = `${total} commits · 12 weeks`;
-  } catch (err) {
-    // Fall back to stale cache if available
+    // 3. Save to localStorage
     try {
-      const raw = localStorage.getItem(GIT_CACHE_KEY);
+      localStorage.setItem(GH_CACHE_KEY, JSON.stringify({ daily, total, ts: Date.now() }));
+    } catch (_) { /* storage full or unavailable */ }
+
+    applyGitData(daily, total);
+    gitStatEl.textContent = `${total} commits · 12 weeks`;
+
+  } catch (err) {
+    // 4. On error, try to fall back to stale cache
+    try {
+      const raw = localStorage.getItem(GH_CACHE_KEY);
       if (raw) {
-        gitData = JSON.parse(raw).data;
-        renderHeatmap();
-        gitStatEl.textContent = `${gitData.total} commits · stale cache`;
-        return;
+        const cached = JSON.parse(raw);
+        if (cached.daily && cached.total != null) {
+          applyGitData(cached.daily, cached.total);
+          const age = Math.floor((Date.now() - cached.ts) / 60000);
+          gitStatEl.textContent = `${cached.total} commits · stale cache (${age < 60 ? age + "m" : Math.floor(age / 60) + "h"})`;
+          return;
+        }
       }
     } catch (_) {}
-    gitStatEl.textContent = "rate limited";
-    gitEl.innerHTML = `<div class="git-error">⚠ ${err.message}</div>`;
+    gitStatEl.textContent = "error";
+    gitEl.innerHTML = `<div class="git-error">⚠ ${err.message} — try again later</div>`;
   }
+}
+
+/* Build gitData from daily counts and render */
+function applyGitData(daily, total) {
+  const today = new Date();
+  const days = [];
+  for (let i = 83; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const k = d.toISOString().split("T")[0];
+    days.push({ date: k, count: daily[k] || 0, dow: d.getDay() });
+  }
+
+  let streak = 0;
+  for (let i = 0; i < 84; i++) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    if (daily[d.toISOString().split("T")[0]]) streak++; else break;
+  }
+
+  const last = total > 0 ? days.filter(d => d.count).pop()?.date || "—" : "—";
+  gitData = { days, total, streak, last };
+  renderHeatmap();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -396,11 +395,9 @@ function tickClock() { clockEl.textContent = now(); }
 /* ═══════════════════════════════════════════════════
    MODAL
    ═══════════════════════════════════════════════════ */
-function toggleModal()   { modalOpen = !modalOpen; resumeModal.classList.toggle("visible", modalOpen); if (modalOpen) { contactOpen = false; contactModal.classList.remove("visible"); } }
-function toggleContact() { contactOpen = !contactOpen; contactModal.classList.toggle("visible", contactOpen); if (contactOpen) { modalOpen = false; resumeModal.classList.remove("visible"); } }
-function closeModals()   { modalOpen = false; contactOpen = false; resumeModal.classList.remove("visible"); contactModal.classList.remove("visible"); }
-resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModals(); });
-contactModal.addEventListener("click", e => { if (e.target === contactModal) closeModals(); });
+function toggleModal() { modalOpen = !modalOpen; resumeModal.classList.toggle("visible", modalOpen); }
+function closeModal()  { modalOpen = false; resumeModal.classList.remove("visible"); }
+resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModal(); });
 
 /* ═══════════════════════════════════════════════════
    CMD BAR FLASH
@@ -419,8 +416,8 @@ function flash(key) {
    KEYBOARD
    ═══════════════════════════════════════════════════ */
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") { closeModals(); return; }
-  if (modalOpen || contactOpen) return;
+  if (e.key === "Escape") { closeModal(); return; }
+  if (modalOpen) return;
 
   switch (e.key.toLowerCase()) {
     case "tab":
@@ -457,8 +454,6 @@ document.addEventListener("keydown", e => {
 
     case "r":
       e.preventDefault(); fetchGit(true); flash("R"); break;
-    case "c":
-      e.preventDefault(); toggleContact(); flash("C"); break;
     case "q":
       e.preventDefault(); toggleModal(); flash("Q"); break;
   }
