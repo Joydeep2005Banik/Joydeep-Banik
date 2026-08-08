@@ -10,6 +10,14 @@ const ABOUT = {
   bio: "Hi, I am Joydeep Banik, a Backend Engineer specializing in Applied ML and RAG Systems, distributed architectures, and MLOps. I design and engineer low-latency server infrastructures, streaming data pipelines, and applied AI systems. My experience spans architecting event-driven pipelines using Kafka, Graph-RAG, and Neo4j, building Kubernetes telemetry tooling, and optimizing computer vision processing pipelines. I focus on production reliability, clean object-oriented architecture, and scalable system design.",
 };
 
+const EDUCATION = [
+  {
+    course: "Bachelor of Technology in Electronics and Communication Engineering",
+    instituition: "RCC Institute of Information Technology",
+    batch: "2023 - 2027",
+  }
+];
+
 const PROJECTS = [
   {
     id: "video-dehazing-rag",
@@ -142,6 +150,7 @@ let gitData = null;
 const $ = (id) => document.getElementById(id);
 
 const aboutEl = $("about-content");
+const eduEl = $("education-content");
 const projListEl = $("project-list");
 const projDetEl = $("project-detail");
 const expListEl = $("experience-list");
@@ -174,13 +183,21 @@ function retrigger(el) {
 }
 
 /* ═══════════════════════════════════════════════════
-   RENDER — ABOUT
+   RENDER — ABOUT & EDUCATION
    ═══════════════════════════════════════════════════ */
 function renderAbout() {
   aboutEl.innerHTML = `
     <div class="about-name">${ABOUT.name}</div>
     <div class="about-title">${ABOUT.title}</div>
     <div class="about-bio">${ABOUT.bio}</div>`;
+}
+
+function renderEducation() {
+  eduEl.innerHTML = EDUCATION.map(e => `
+    <div class="about-title" style="color:var(--emerald-300);font-weight:bold">${e.instituition}</div>
+    <div class="about-bio" style="color:var(--cyan-300)">${e.course}</div>
+    <div class="about-bio">${e.batch}</div>
+  `).join("");
 }
 
 /* ═══════════════════════════════════════════════════
@@ -475,6 +492,7 @@ document.addEventListener("keydown", e => {
    ═══════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
   renderAbout();
+  renderEducation();
   renderProjList(); renderProjDet();
   renderExpList(); renderExpDet();
   syncFocus();
