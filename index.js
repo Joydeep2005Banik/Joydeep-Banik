@@ -11,11 +11,10 @@ const ABOUT = {
 };
 
 const SKILLS = {
-  "Languages":  ["Python", "JavaScript", "C", "SQL"],
-  "ML / AI":    ["PyTorch", "RAG", "CNN", "K-Means"],
-  "Infra":      ["Kubernetes", "Kafka", "Docker", "SSH"],
-  "Data":       ["Neo4j", "VectorDB", "GEE"],
-  "Tools":      ["Git", "Linux", "Textual", "FastAPI"],
+  "Languages":          ["Python", "C++", "TypeScript", "Bash", "MATLAB"],
+  "Backend & Database": ["Django", "Flask", "NodeJS", "MySQL", "SQLite", "SQL"],
+  "ML/AI":              ["TensorFlow", "PyTorch", "OpenCV"],
+  "Infra & Tools":      ["Kubernetes", "Docker", "Git"],
 };
 
 const EDUCATION = [
