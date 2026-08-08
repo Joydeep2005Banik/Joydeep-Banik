@@ -5,9 +5,9 @@
 const GITHUB_USERNAME = "Joydeep2005Banik";
 
 const ABOUT = {
-  name: "Joydeep Banik",
-  title: "B.Tech CSE · Jadavpur University Salt Lake · Batch 2027",
-  bio: "Backend-leaning CS undergrad building at the intersection of infrastructure, applied ML, and retrieval-augmented systems. Most at home in Python, terminal UIs, and pipeline architecture.",
+  name: "Hi! I am Joydeep Banik",
+  title: "Backend Engineer / Applied ML & RAG Systems",
+  bio: "Hi, I am Joydeep Banik, a Backend Engineer specializing in Applied ML and RAG Systems, distributed architectures, and MLOps. I design and engineer low-latency server infrastructures, streaming data pipelines, and applied AI systems. My experience spans architecting event-driven pipelines using Kafka, Graph-RAG, and Neo4j, building Kubernetes telemetry tooling, and optimizing computer vision processing pipelines. I focus on production reliability, clean object-oriented architecture, and scalable system design.",
   links: [
     { label: "GitHub", url: "https://github.com/Joydeep2005Banik", text: "Joydeep2005Banik" },
     { label: "Email", url: "mailto:joydeepbanik2005@gmail.com", text: "joydeepbanik2005@gmail.com" },
