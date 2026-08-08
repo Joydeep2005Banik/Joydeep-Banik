@@ -26,64 +26,70 @@
         <span class="titlebar-clock" id="clock">00:00:00</span>
       </div>
 
-      <!-- 6-Pane Grid -->
+      <!-- 2-Column Layout -->
       <div class="grid-6">
 
-        <!-- TOP-LEFT: About -->
-        <div class="pane pane-tl" id="pane-about">
-          <div class="section-header">about</div>
-          <div class="about-content" id="about-content"></div>
-        </div>
-
-        <!-- SKILLS-LEFT: Skills -->
-        <div class="pane pane-sl" id="pane-skills">
-          <div class="section-header">skills</div>
-          <div class="about-content" id="skills-content"></div>
-        </div>
-
-        <!-- EDU-LEFT: Education -->
-        <div class="pane pane-el" id="pane-education">
-          <div class="section-header">education</div>
-          <div class="about-content" id="education-content"></div>
-        </div>
-
-        <!-- TOP-RIGHT: Experience Listing -->
-        <div class="pane pane-tr" id="pane-exp-list">
-          <div class="section-header">
-            <span>experience</span>
-            <span class="hint">TAB switch · ↑↓ navigate</span>
+        <!-- LEFT COLUMN -->
+        <div class="col-left">
+          <!-- About -->
+          <div class="pane" id="pane-about">
+            <div class="section-header">about</div>
+            <div class="about-content" id="about-content"></div>
           </div>
-          <ul class="sel-list" id="experience-list"></ul>
-        </div>
 
-        <!-- MID-LEFT: Projects Listing -->
-        <div class="pane pane-ml" id="pane-proj-list">
-          <div class="section-header">
-            <span>projects</span>
-            <span class="hint">↑↓ navigate</span>
+          <!-- Skills -->
+          <div class="pane" id="pane-skills">
+            <div class="section-header">skills</div>
+            <div class="about-content" id="skills-content"></div>
           </div>
-          <ul class="sel-list" id="project-list"></ul>
-        </div>
 
-        <!-- MID-RIGHT: Experience Detail -->
-        <div class="pane pane-mr">
-          <div class="section-header">experience — detail</div>
-          <div class="detail-pane" id="experience-detail"></div>
-        </div>
-
-        <!-- BOT-LEFT: Project Detail -->
-        <div class="pane pane-bl">
-          <div class="section-header">project — detail</div>
-          <div class="detail-pane" id="project-detail"></div>
-        </div>
-
-        <!-- BOT-RIGHT: Git Commit Heatmap -->
-        <div class="pane pane-br">
-          <div class="section-header">
-            <span>git commit history</span>
-            <span class="hint" id="git-status">fetching…</span>
+          <!-- Education -->
+          <div class="pane" id="pane-education">
+            <div class="section-header">education</div>
+            <div class="about-content" id="education-content"></div>
           </div>
-          <div class="git-area" id="git-heatmap"></div>
+
+          <!-- Projects Listing -->
+          <div class="pane" id="pane-proj-list">
+            <div class="section-header">
+              <span>projects</span>
+              <span class="hint">↑↓ navigate</span>
+            </div>
+            <ul class="sel-list" id="project-list"></ul>
+          </div>
+
+          <!-- Project Detail -->
+          <div class="pane pane-grow">
+            <div class="section-header">project — detail</div>
+            <div class="detail-pane" id="project-detail"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-right">
+          <!-- Experience Listing -->
+          <div class="pane" id="pane-exp-list">
+            <div class="section-header">
+              <span>experience</span>
+              <span class="hint">TAB switch · ↑↓ navigate</span>
+            </div>
+            <ul class="sel-list" id="experience-list"></ul>
+          </div>
+
+          <!-- Experience Detail -->
+          <div class="pane" id="pane-exp-det">
+            <div class="section-header">experience — detail</div>
+            <div class="detail-pane" id="experience-detail"></div>
+          </div>
+
+          <!-- Git Commit Heatmap -->
+          <div class="pane pane-grow pane-last">
+            <div class="section-header">
+              <span>git commit history</span>
+              <span class="hint" id="git-status">fetching…</span>
+            </div>
+            <div class="git-area" id="git-heatmap"></div>
+          </div>
         </div>
 
       </div>
