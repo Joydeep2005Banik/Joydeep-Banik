@@ -148,16 +148,17 @@ let gitData    = null;
    ═══════════════════════════════════════════════════ */
 const $ = (id) => document.getElementById(id);
 
-const aboutEl     = $("about-content");
-const projListEl  = $("project-list");
-const projDetEl   = $("project-detail");
-const expListEl   = $("experience-list");
-const expDetEl    = $("experience-detail");
-const gitEl       = $("git-heatmap");
-const gitStatEl   = $("git-status");
-const clockEl     = $("clock");
-const resumeModal = $("resume-modal");
-const cmdbar      = $("cmdbar");
+const aboutEl      = $("about-content");
+const projListEl   = $("project-list");
+const projDetEl    = $("project-detail");
+const expListEl    = $("experience-list");
+const expDetEl     = $("experience-detail");
+const gitEl        = $("git-heatmap");
+const gitStatEl    = $("git-status");
+const clockEl      = $("clock");
+const resumeModal  = $("resume-modal");
+const contactModal = $("contact-modal");
+const cmdbar       = $("cmdbar");
 
 const paneProjList = $("pane-proj-list");
 const paneExpList  = $("pane-exp-list");
@@ -395,9 +396,21 @@ function tickClock() { clockEl.textContent = now(); }
 /* ═══════════════════════════════════════════════════
    MODAL
    ═══════════════════════════════════════════════════ */
-function toggleModal() { modalOpen = !modalOpen; resumeModal.classList.toggle("visible", modalOpen); }
-function closeModal()  { modalOpen = false; resumeModal.classList.remove("visible"); }
+function toggleResume() { 
+  modalOpen = !modalOpen; 
+  resumeModal.classList.toggle("visible", modalOpen); 
+}
+function toggleContact() { 
+  modalOpen = !modalOpen; 
+  contactModal.classList.toggle("visible", modalOpen); 
+}
+function closeModal() { 
+  modalOpen = false; 
+  resumeModal.classList.remove("visible"); 
+  contactModal.classList.remove("visible"); 
+}
 resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModal(); });
+contactModal.addEventListener("click", e => { if (e.target === contactModal) closeModal(); });
 
 /* ═══════════════════════════════════════════════════
    CMD BAR FLASH
@@ -454,8 +467,10 @@ document.addEventListener("keydown", e => {
 
     case "r":
       e.preventDefault(); fetchGit(true); flash("R"); break;
+    case "c":
+      e.preventDefault(); toggleContact(); flash("C"); break;
     case "q":
-      e.preventDefault(); toggleModal(); flash("Q"); break;
+      e.preventDefault(); toggleResume(); flash("Q"); break;
   }
 });
 
