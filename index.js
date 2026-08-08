@@ -8,13 +8,6 @@ const ABOUT = {
   name: "Hi! I am Joydeep Banik",
   title: "Backend Engineer / Applied ML & RAG Systems",
   bio: "Hi, I am Joydeep Banik, a Backend Engineer specializing in Applied ML and RAG Systems, distributed architectures, and MLOps. I design and engineer low-latency server infrastructures, streaming data pipelines, and applied AI systems. My experience spans architecting event-driven pipelines using Kafka, Graph-RAG, and Neo4j, building Kubernetes telemetry tooling, and optimizing computer vision processing pipelines. I focus on production reliability, clean object-oriented architecture, and scalable system design.",
-  links: [
-    { label: "GitHub", url: "https://github.com/Joydeep2005Banik", text: "Joydeep2005Banik" },
-    { label: "Email", url: "mailto:joydeepbanik2005@gmail.com", text: "joydeepbanik2005@gmail.com" },
-    { label: "LinkedIn", url: "https://linkedin.com/in/joydeep-banik", text: "joydeep-banik" },
-    { label: "Location", url: null, text: "Kolkata, India" },
-  ],
-  specs: ["Python", "PyTorch", "RAG", "Kubernetes", "Kafka", "Neo4j", "Docker", "FastAPI"],
 };
 
 const PROJECTS = [
@@ -184,17 +177,9 @@ function retrigger(el) {
    RENDER — ABOUT
    ═══════════════════════════════════════════════════ */
 function renderAbout() {
-  const links = ABOUT.links.map(l =>
-    l.url
-      ? `<a href="${l.url}" target="_blank" rel="noopener" class="about-link">${l.label}: ${l.text}</a>`
-      : `<span class="about-link" style="color:var(--emerald-300);cursor:default">${l.label}: ${l.text}</span>`
-  ).join("");
-  const tags = ABOUT.specs.map(s => `<span class="tag">${s}</span>`).join("");
   aboutEl.innerHTML = `
     <div class="about-name">${ABOUT.name}</div>
     <div class="about-title">${ABOUT.title}</div>
-    <div class="about-links">${links}</div>
-    <div class="about-spec">${tags}</div>
     <div class="about-bio">${ABOUT.bio}</div>`;
 }
 
