@@ -10,6 +10,14 @@ const ABOUT = {
   bio: "Hi, I am Joydeep Banik, a Backend Engineer specializing in Applied ML and RAG Systems, distributed architectures, and MLOps. I design and engineer low-latency server infrastructures, streaming data pipelines, and applied AI systems. My experience spans architecting event-driven pipelines using Kafka, Graph-RAG, and Neo4j, building Kubernetes telemetry tooling, and optimizing computer vision processing pipelines. I focus on production reliability, clean object-oriented architecture, and scalable system design.",
 };
 
+const SKILLS = {
+  "Languages":  ["Python", "JavaScript", "C", "SQL"],
+  "ML / AI":    ["PyTorch", "RAG", "CNN", "K-Means"],
+  "Infra":      ["Kubernetes", "Kafka", "Docker", "SSH"],
+  "Data":       ["Neo4j", "VectorDB", "GEE"],
+  "Tools":      ["Git", "Linux", "Textual", "FastAPI"],
+};
+
 const EDUCATION = [
   {
     course: "Bachelor of Technology in Electronics and Communication Engineering",
@@ -150,6 +158,7 @@ let gitData = null;
 const $ = (id) => document.getElementById(id);
 
 const aboutEl = $("about-content");
+const skillsEl = $("skills-content");
 const eduEl = $("education-content");
 const projListEl = $("project-list");
 const projDetEl = $("project-detail");
@@ -190,6 +199,15 @@ function renderAbout() {
     <div class="about-name">${ABOUT.name}</div>
     <div class="about-title">${ABOUT.title}</div>
     <div class="about-bio">${ABOUT.bio}</div>`;
+}
+
+function renderSkills() {
+  skillsEl.innerHTML = Object.entries(SKILLS).map(([cat, items]) => `
+    <div class="skill-row">
+      <span class="skill-cat">${cat}</span>
+      <span class="skill-items">${items.join(" · ")}</span>
+    </div>
+  `).join("");
 }
 
 function renderEducation() {
@@ -492,6 +510,7 @@ document.addEventListener("keydown", e => {
    ═══════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
   renderAbout();
+  renderSkills();
   renderEducation();
   renderProjList(); renderProjDet();
   renderExpList(); renderExpDet();
