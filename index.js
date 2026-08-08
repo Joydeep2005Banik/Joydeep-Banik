@@ -11,10 +11,10 @@ const ABOUT = {
 };
 
 const SKILLS = {
-  "Languages":          ["Python", "C++", "TypeScript", "Bash", "MATLAB"],
+  "Languages": ["Python", "C++", "TypeScript", "Bash", "MATLAB"],
   "Backend & Database": ["Django", "Flask", "NodeJS", "MySQL", "SQLite", "SQL"],
-  "ML/AI":              ["TensorFlow", "PyTorch", "OpenCV"],
-  "Infra & Tools":      ["Kubernetes", "Docker", "Git"],
+  "ML/AI": ["TensorFlow", "PyTorch", "OpenCV"],
+  "Infra & Tools": ["Kubernetes", "Docker", "Git"],
 };
 
 const EDUCATION = [
@@ -41,42 +41,30 @@ const PROJECTS = [
   },
   {
     id: "kubesense",
-    name: "kubesense",
-    status: "WARN", statusLabel: "BUILDING",
+    name: "KubeSense",
+    status: "OK", statusLabel: "RUNNING",
     ref: "kubectl::ctx", node: "local-cluster", ns: "devtools",
     stack: ["Python", "Textual", "Kubernetes", "SSH"],
-    summary: "Real-time Kubernetes cluster monitor with dynamic log tailing, multi-node SSH metric fallback, and passive AI-driven log parsing for zero-GUI diagnostics.",
-    bullets: [
-      "TUI built with Textual for zero-GUI cluster observability",
-      "Multi-node SSH fallback when kubectl metrics-server unavailable",
-      "Passive AI-driven log parsing for anomaly detection",
-    ],
+    link: "https://github.com/Joydeep2005Banik/pod_monitor",
+    summary: "KubeSense is an advanced, terminal-based user interface (TUI) application designed for real-time Kubernetes cluster monitoring and zero-GUI system diagnostics. The system features live container log tailing, multi-node SSH metric fallback routing, and passive AI-driven log parsing for dynamic anomaly detection—allowing administrators and developers to triage infrastructure incidents and evaluate pod telemetry seamlessly without relying on complex graphical interfaces.",
   },
   {
     id: "sovereign-bharat",
-    name: "sovereign-bharat-graph",
+    name: "Sovereign Bharat Intelligence Graph",
     status: "OK", statusLabel: "RUNNING",
     ref: "neo4j::bolt", node: "graph-rag", ns: "data-infra",
-    stack: ["Neo4j", "Apache Kafka", "Gemma 3", "Python"],
-    summary: "Real-time Graph-RAG pipeline combining a Neo4j knowledge graph with a decoupled Kafka ingestion layer and an LLM for context-aware strategic querying.",
-    bullets: [
-      "Kafka-decoupled ingestion into Neo4j knowledge graph",
-      "Gemma 3 LLM for context-aware Cypher query generation",
-      "Real-time graph traversal for strategic intelligence queries",
-    ],
+    stack: ["Apache Kafka", "Neo4j", "Qdrant", "DSPy", "spaCy", "LangGraph", "Qwen 3", "Fast API", "BeautifulSoup", "Scrapy", "Docker", "Kubernetes"],
+    link: "https://github.com/Joydeep2005Banik/Sovereign-Bharat-Intelligence-Graph--SBIG-",
+    summary: "SBIG is a high-performance Global Ontology Engine designed to unify structured data, unstructured content, and live real-time feeds into a single, constantly updating intelligence graph. It serves as a strategic decision edge by linking disparate data points—from geopolitics and economics to climate and defense—into a connected map for early risk detection and scenario simulation. Selected as team finalist for India Innovates 2026"
   },
   {
     id: "agrisense",
-    name: "agrisense",
+    name: "AgriSense AI",
     status: "OK", statusLabel: "RUNNING",
     ref: "gee::landsat9", node: "sih-2025", ns: "remote-sensing",
     stack: ["Python", "GEE", "CNN", "K-Means"],
-    summary: "Automated Landsat 9 satellite pipeline (CNN/K-Means) feeding an interactive dashboard, removing manual crop-stress analysis across multi-hectare farmland.",
-    bullets: [
-      "SIH 2025 semi-finalist project",
-      "CNN + K-Means for automated crop stress classification",
-      "Google Earth Engine integration for satellite imagery",
-    ],
+    link: "https://github.com/Joydeep2005Banik/AgriSenseAI",
+    summary: "AgriSense AI is an automated satellite analytics platform engineered to eliminate manual crop-stress processing across multi-hectare farmland. Developed for Smart India Hackathon 2025, the system integrates a Google Earth Engine (GEE) and Python pipeline powered by CNN and K-Means algorithms to process Landsat 9 telemetry—allowing agricultural teams and field analysts to continuously detect vegetation stress and evaluate satellite data seamlessly through an interactive web dashboard.",
   },
 ];
 
@@ -239,9 +227,14 @@ function renderProjDet() {
     <div class="detail-row"><span class="label">Node:</span> <span class="val">${p.node}</span></div>
     <div class="detail-row"><span class="label">Namespace:</span> <span class="val fuchsia">${p.ns}</span></div>
     <div class="detail-row"><span class="label">Status:</span> ${badge(p.status)} <span class="val">(${p.statusLabel})</span></div>
-    <div class="stack-tags">${p.stack.map(s => `<span class="tag">${s}</span>`).join("")}</div>
+    ${p.link ? `<div class="detail-row"><span class="label">Link:</span> <a href="${p.link}" target="_blank" rel="noopener" class="val cyan about-link">${p.link}</a></div>` : ""}
+    <div class="detail-row" style="display: flex; align-items: center; gap: 0.75rem;">
+      <span class="label">Stack:</span>
+      <div class="stack-tags" style="padding-top: 0;">${p.stack.map(s => `<span class="tag">${s}</span>`).join("")}</div>
+    </div>
     <p class="detail-summary">${p.summary}</p>
-    <ul class="detail-bullets">${p.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>`;
+    ${p.bullets ? `<ul class="detail-bullets">${p.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
+  `;
   retrigger(projDetEl);
 }
 
