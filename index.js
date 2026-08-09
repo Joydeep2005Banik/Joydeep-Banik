@@ -208,7 +208,7 @@ function renderEducation() {
   eduEl.innerHTML = EDUCATION.map(e => `
     <div class="about-title" style="color:var(--amber-400);font-weight:bold">${e.instituition}</div>
     <div class="about-bio" style="color:#f0abfc">${e.course}</div>
-    <div class="about-bio">${e.batch}</div>
+    <div class="about-bio" style="color:#fafcfc">${e.batch}</div>
   `).join("");
 }
 

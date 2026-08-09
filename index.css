@@ -342,15 +342,15 @@ body::after {
 }
 
 .status-badge.ok {
-  color: var(--emerald-400)
+  color: #34d399
 }
 
 .status-badge.warn {
-  color: var(--amber-400)
+  color: #f0abfc
 }
 
 .status-badge.err {
-  color: var(--red-400)
+  color: #f0abfc
 }
 
 /* ═══ Detail Panes ═══════════════════════════════ */
@@ -383,11 +383,11 @@ body::after {
 }
 
 .detail-row .label {
-  color: #00FF87
+  color: #34d399
 }
 
 .detail-row .val {
-  color: var(--emerald-300)
+  color: #f0abfc
 }
 
 .detail-row .val.bold {
@@ -396,15 +396,15 @@ body::after {
 }
 
 .detail-row .val.cyan {
-  color: var(--cyan-300)
+  color: #f0abfc
 }
 
 .detail-row .val.fuchsia {
-  color: var(--fuchsia-300)
+  color: #f0abfc
 }
 
 .detail-row .val.amber {
-  color: var(--amber-400)
+  color: #f0abfc
 }
 
 .stack-tags {
@@ -418,7 +418,7 @@ body::after {
   font-size: var(--text-xs);
   padding: 2px 6px;
   border: 1px solid var(--border);
-  color: var(--emerald-300);
+  color: #f0abfc;
   border-radius: 2px;
   transition: all .2s;
 }
