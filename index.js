@@ -28,10 +28,10 @@ const EDUCATION = [
 const PROJECTS = [
   {
     id: "video-dehazing-rag",
-    name: "video-dehazing-rag",
-    status: "WARN", statusLabel: "BUILDING",
+    name: "Retrieval Augmented Video Dehazing",
+    status: "OK", statusLabel: "RUNNING",
     ref: "vae::latent", node: "jadavpur-research", ns: "ml-infra",
-    stack: ["Python", "PyTorch", "VectorDB", "RAG"],
+    stack: ["Python", "PyTorch", "VectorDB", "RAG", "ffmpeg", "OpenCV"],
     summary: "End-to-end RAG pipeline mapping hazy frames into a latent vector space, using residual transformation and decoder synthesis to reconstruct clear video.",
     bullets: [
       "Retrieval-augmented generation applied outside text",
@@ -44,7 +44,7 @@ const PROJECTS = [
     name: "KubeSense",
     status: "OK", statusLabel: "RUNNING",
     ref: "kubectl::ctx", node: "local-cluster", ns: "devtools",
-    stack: ["Python", "Textual", "Kubernetes", "SSH"],
+    stack: ["Python", "Docker", "Kubernetes", "Textual", "Rich", "AsyncSSH", "k8 API", "asyncio", "PyYAML", "pytest"],
     link: "https://github.com/Joydeep2005Banik/pod_monitor",
     summary: "KubeSense is an advanced, terminal-based user interface (TUI) application designed for real-time Kubernetes cluster monitoring and zero-GUI system diagnostics. The system features live container log tailing, multi-node SSH metric fallback routing, and passive AI-driven log parsing for dynamic anomaly detection—allowing administrators and developers to triage infrastructure incidents and evaluate pod telemetry seamlessly without relying on complex graphical interfaces.",
   },
@@ -62,7 +62,7 @@ const PROJECTS = [
     name: "AgriSense AI",
     status: "OK", statusLabel: "RUNNING",
     ref: "gee::landsat9", node: "sih-2025", ns: "remote-sensing",
-    stack: ["Python", "GEE", "CNN", "K-Means"],
+    stack: ["Python", "Landsat 9 OLI-2/TIRS-2", "GEE", "USGS", "Rasterio", "NumPy", "OpenCV", "PyTorch", "FastAPI", "CUDA"],
     link: "https://github.com/Joydeep2005Banik/AgriSenseAI",
     summary: "AgriSense AI is an automated satellite analytics platform engineered to eliminate manual crop-stress processing across multi-hectare farmland. Developed for Smart India Hackathon 2025, the system integrates a Google Earth Engine (GEE) and Python pipeline powered by CNN and K-Means algorithms to process Landsat 9 telemetry—allowing agricultural teams and field analysts to continuously detect vegetation stress and evaluate satellite data seamlessly through an interactive web dashboard.",
   },
