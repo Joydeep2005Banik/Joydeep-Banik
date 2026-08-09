@@ -71,32 +71,31 @@ const PROJECTS = [
 const EXPERIENCES = [
   {
     id: "ju-research",
-    role: "Research Assistant",
+    role: "Research Intern",
     org: "Jadavpur University",
-    period: "2025 — Present",
+    period: "May, 2026 - Present",
     status: "WARN", statusLabel: "ONGOING",
-    type: "research",
+    type: "Internship",
     stack: ["Python", "PyTorch", "RAG", "VectorDB"],
-    summary: "Video dehazing research via retrieval-augmented generation — mapping hazy frames into latent vector space using residual transformation and decoder synthesis.",
+    summary: "Conducting computer vision research focused on low-level image restoration and deep learning pipelines for video dehazing.",
     bullets: [
-      "Novel application of RAG beyond text domains",
-      "Latent-space residual transformation architecture",
-      "Decoder synthesis for clear frame reconstruction",
+      "Optimized a real-time CNN dehazing pipeline in Python, reducing frame latency through efficient pre-processing and model acceleration.",
+      "Architecting an end-to-end Retrieval-Augmented Generation (RAG) framework that integrates latent-space feature retrieval pipelines to improve frame-level clarity and preserve temporal consistency across video sequences."
     ],
   },
   {
     id: "haldia",
-    role: "IT Intern",
+    role: "Information Systems Intern",
     org: "Haldia Petrochemicals Ltd",
-    period: "2025",
+    period: "December, 2025 - January, 2026",
     status: "OK", statusLabel: "COMPLETED",
     type: "internship",
-    stack: ["Python", "OOP", "Unit Testing"],
-    summary: "Designed and implemented a role-based OOP inventory management system with comprehensive unit testing and production-grade code quality.",
+    stack: ["Python", "OOP", "Unit Testing", "Networking"],
+    summary: "Engineered enterprise software solutions to modernize inventory operations and improved multi-tier network observability.",
     bullets: [
-      "Role-based access control across inventory workflows",
-      "Comprehensive unit test suite for all business logic",
-      "Production-grade Python with clean architecture patterns",
+      "Role-Based Store Management Engine: Built an API-driven inventory system in Python using OOP principles to automate tracking across procurement, warehouse, and logistics departments.",
+      "Transactional Reliability: Implemented unit-tested database transactions that eliminated manual inventory errors and enforced production-grade code quality.",
+      "Network Infrastructure & Telemetry: Audited a 3-layer enterprise network architecture and leveraged PRTG telemetry to accelerate infrastructure incident triage and boost system uptime.",
     ],
   },
   {
@@ -262,7 +261,8 @@ function renderExpDet() {
     <div class="detail-row"><span class="label">Status:</span> <span class="val">${e.statusLabel}</span></div>
     <div class="stack-tags">${e.stack.map(s => `<span class="tag">${s}</span>`).join("")}</div>
     <p class="detail-summary">${e.summary}</p>
-    <ul class="detail-bullets">${e.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>`;
+    ${e.bullets ? `<ul class="detail-bullets">${e.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
+  `;
   retrigger(expDetEl);
 }
 
