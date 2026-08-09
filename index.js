@@ -25,6 +25,12 @@ const EDUCATION = [
   }
 ];
 
+const HONORS = [
+  "'A Review of Dehazing Benchmark Datasets' — Accepted for presentation, 15th International Conference on Image Processing Theory, Tools and Applications (IPTA), December, 2026",
+  "Finalist — India Innovates 2026: Selected as a national finalist for Sovereign Bharat Intelligence Graph (SBIG), a high-performance ontology engine combining Neo4j, Apache Kafka, and Gemma 3 LLM for real-time threat intelligence and scenario simulation.",
+  "Semifinalist — Smart India Hackathon 2025: Recognized as a national semifinalist for AgriSense AI, an automated satellite analytics platform utilizing Google Earth Engine, CNNs, and K-Means clustering for multi-hectare crop-stress detection."
+];
+
 const PROJECTS = [
   {
     id: "video-dehazing-rag",
@@ -146,6 +152,7 @@ const $ = (id) => document.getElementById(id);
 const aboutEl = $("about-content");
 const skillsEl = $("skills-content");
 const eduEl = $("education-content");
+const honorsEl = $("honors-content");
 const projListEl = $("project-list");
 const projDetEl = $("project-detail");
 const expListEl = $("experience-list");
@@ -202,6 +209,10 @@ function renderEducation() {
     <div class="about-bio" style="color:var(--cyan-300)">${e.course}</div>
     <div class="about-bio">${e.batch}</div>
   `).join("");
+}
+
+function renderHonors() {
+  honorsEl.innerHTML = `<ul class="detail-bullets">${HONORS.map(h => `<li>${esc(h)}</li>`).join("")}</ul>`;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -504,6 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderAbout();
   renderSkills();
   renderEducation();
+  renderHonors();
   renderProjList(); renderProjDet();
   renderExpList(); renderExpDet();
   syncFocus();
