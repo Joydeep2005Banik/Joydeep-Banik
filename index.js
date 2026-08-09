@@ -86,10 +86,10 @@ const EXPERIENCES = [
   {
     id: "haldia",
     role: "Information Systems Intern",
-    org: "Haldia Petrochemicals Ltd",
+    org: "Haldia Petrochemicals Ltd.",
     period: "December, 2025 - January, 2026",
     status: "OK", statusLabel: "COMPLETED",
-    type: "internship",
+    type: "Internship",
     stack: ["Python", "OOP", "Unit Testing", "Networking"],
     summary: "Engineered enterprise software solutions to modernize inventory operations and improved multi-tier network observability.",
     bullets: [
@@ -100,11 +100,11 @@ const EXPERIENCES = [
   },
   {
     id: "amplify-ctf",
-    role: "CTF Infrastructure Lead",
-    org: "Amplify CTF",
+    role: "Event Coordinator",
+    org: "Amplify - RCCIIT",
     period: "2025",
     status: "OK", statusLabel: "COMPLETED",
-    type: "activity",
+    type: "Volunteer",
     stack: ["Full-stack", "Scoring Engine", "Monitoring"],
     summary: "Built full-stack Capture The Flag infrastructure including scoring logic, challenge deployment pipelines, and live monitoring dashboards.",
     bullets: [
@@ -116,15 +116,15 @@ const EXPERIENCES = [
   {
     id: "rcc-talkies",
     role: "Research Wing Member",
-    org: "RCC Talkies",
-    period: "2024 — Present",
+    org: "RCC Talkies - RCCIIT",
+    period: "2024 — 2025",
     status: "OK", statusLabel: "COMPLETED",
-    type: "activity",
+    type: "Volunteer",
     stack: ["Technical Writing", "Research"],
-    summary: "Contributing feature articles on emerging technology trends for the university's research and communications wing.",
+    summary: "Contributing feature articles on emerging technology trends for the instituition's technical magazine.",
     bullets: [
       "Feature articles on ML, infrastructure, and emerging tech",
-      "Technical writing for university research communications",
+      "Technical writing for instituition's technical magazine",
     ],
   },
 ];
