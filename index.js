@@ -70,21 +70,6 @@ const PROJECTS = [
 
 const EXPERIENCES = [
   {
-    id: "haldia",
-    role: "IT Intern",
-    org: "Haldia Petrochemicals Ltd",
-    period: "2025",
-    status: "OK", statusLabel: "COMPLETED",
-    type: "internship",
-    stack: ["Python", "OOP", "Unit Testing"],
-    summary: "Designed and implemented a role-based OOP inventory management system with comprehensive unit testing and production-grade code quality.",
-    bullets: [
-      "Role-based access control across inventory workflows",
-      "Comprehensive unit test suite for all business logic",
-      "Production-grade Python with clean architecture patterns",
-    ],
-  },
-  {
     id: "ju-research",
     role: "Research Assistant",
     org: "Jadavpur University",
@@ -100,11 +85,26 @@ const EXPERIENCES = [
     ],
   },
   {
+    id: "haldia",
+    role: "IT Intern",
+    org: "Haldia Petrochemicals Ltd",
+    period: "2025",
+    status: "OK", statusLabel: "COMPLETED",
+    type: "internship",
+    stack: ["Python", "OOP", "Unit Testing"],
+    summary: "Designed and implemented a role-based OOP inventory management system with comprehensive unit testing and production-grade code quality.",
+    bullets: [
+      "Role-based access control across inventory workflows",
+      "Comprehensive unit test suite for all business logic",
+      "Production-grade Python with clean architecture patterns",
+    ],
+  },
+  {
     id: "amplify-ctf",
     role: "CTF Infrastructure Lead",
     org: "Amplify CTF",
     period: "2025",
-    status: "OK", statusLabel: "DEPLOYED",
+    status: "OK", statusLabel: "COMPLETED",
     type: "activity",
     stack: ["Full-stack", "Scoring Engine", "Monitoring"],
     summary: "Built full-stack Capture The Flag infrastructure including scoring logic, challenge deployment pipelines, and live monitoring dashboards.",
@@ -119,7 +119,7 @@ const EXPERIENCES = [
     role: "Research Wing Member",
     org: "RCC Talkies",
     period: "2024 — Present",
-    status: "OK", statusLabel: "ACTIVE",
+    status: "OK", statusLabel: "COMPLETED",
     type: "activity",
     stack: ["Technical Writing", "Research"],
     summary: "Contributing feature articles on emerging technology trends for the university's research and communications wing.",
@@ -244,7 +244,7 @@ function renderProjDet() {
 function renderExpList() {
   expListEl.innerHTML = EXPERIENCES.map((e, i) => `
     <li class="sel-row${i === expIdx ? " active" : ""}" data-i="${i}" data-list="exp">
-      <span class="left">${badge(e.status)}<span class="sel-name">${e.org}</span></span>
+      <span class="left"><span style="color:var(--text-dim); margin-right:8px;">[${e.statusLabel}]</span><span class="sel-name">${e.org}</span></span>
       <span class="sel-sub">${e.role}</span>
     </li>`).join("");
   expListEl.querySelectorAll(".sel-row").forEach(el =>
@@ -259,7 +259,7 @@ function renderExpDet() {
     <div class="detail-row"><span class="label">Organization:</span> <span class="val cyan">${e.org}</span></div>
     <div class="detail-row"><span class="label">Period:</span> <span class="val amber">${e.period}</span></div>
     <div class="detail-row"><span class="label">Type:</span> <span class="val fuchsia">${e.type}</span></div>
-    <div class="detail-row"><span class="label">Status:</span> ${badge(e.status)} <span class="val">(${e.statusLabel})</span></div>
+    <div class="detail-row"><span class="label">Status:</span> <span class="val">${e.statusLabel}</span></div>
     <div class="stack-tags">${e.stack.map(s => `<span class="tag">${s}</span>`).join("")}</div>
     <p class="detail-summary">${e.summary}</p>
     <ul class="detail-bullets">${e.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>`;
