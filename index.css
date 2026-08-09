@@ -654,7 +654,7 @@ kbd {
   max-width: 640px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
-  box-shadow: 0 0 80px -10px rgba(52, 211, 153, .35);
+  box-shadow: 0 0 80px -10px rgba(251, 191, 36, .35);
   transform: scale(.92) translateY(12px);
   transition: transform .3s;
 }
