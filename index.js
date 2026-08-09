@@ -86,7 +86,8 @@ const EXPERIENCES = [
     summary: "Conducting computer vision research focused on low-level image restoration and deep learning pipelines for video dehazing.",
     bullets: [
       "Optimized a real-time CNN dehazing pipeline in Python, reducing frame latency through efficient pre-processing and model acceleration.",
-      "Architecting an end-to-end Retrieval-Augmented Generation (RAG) framework that integrates latent-space feature retrieval pipelines to improve frame-level clarity and preserve temporal consistency across video sequences."
+      "Architecting an end-to-end Retrieval-Augmented Generation (RAG) framework that integrates latent-space feature retrieval pipelines to improve frame-level clarity and preserve temporal consistency across video sequences.",
+      "'A Review of Dehazing Benchmark Datasets' — Accepted for presentation, 15th International Conference on Image Processing Theory, Tools and Applications (IPTA), December, 2026"
     ],
   },
   {
@@ -501,8 +502,8 @@ document.addEventListener("keydown", e => {
 
     case "r":
       e.preventDefault(); fetchGit(true); flash("R"); break;
-    case "c":
-      e.preventDefault(); toggleContact(); flash("C"); break;
+    case "s":
+      e.preventDefault(); toggleContact(); flash("S"); break;
     case "q":
       e.preventDefault(); toggleResume(); flash("Q"); break;
   }
