@@ -24,9 +24,9 @@
   --zinc-800: #27272a;
 
   --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
-  --text-xs: 12px;
-  --text-sm: 13px;
-  --text-base: 14px;
+  --text-xs: 13px;
+  --text-sm: 14px;
+  --text-base: 15px;
   --glow: 0 0 60px -15px rgba(52, 211, 153, .20);
 }
 
@@ -188,6 +188,20 @@ body::after {
   border-bottom: none
 }
 
+/* Experience — Details: capped height, scrolls internally so
+   Git Commits and Honors & Publications aren't pushed down */
+#pane-exp-det {
+  flex: 0 0 auto;
+  max-height: 32vh;
+  min-height: 0;
+}
+
+#pane-exp-det .detail-pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 /* ═══ Section Headers ════════════════════════════ */
 .section-header {
   padding: 5px 12px;
@@ -261,7 +275,7 @@ body::after {
 
 .about-bio {
   color: #fafcfc;
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   line-height: 1.6;
   margin-top: 6px
 }
@@ -271,7 +285,7 @@ body::after {
   display: flex;
   gap: 10px;
   padding: 2px 0 2px 12px;
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   line-height: 1.6
 }
 
@@ -347,11 +361,11 @@ body::after {
 }
 
 .status-badge.warn {
-  color: #f0abfc
+  color: var(--amber-400)
 }
 
 .status-badge.err {
-  color: #f0abfc
+  color: var(--red-400)
 }
 
 /* ═══ Detail Panes ═══════════════════════════════ */
@@ -398,15 +412,15 @@ body::after {
 }
 
 .detail-row .val.cyan {
-  color: #f0abfc
+  color: var(--cyan-300)
 }
 
 .detail-row .val.fuchsia {
-  color: #f0abfc
+  color: var(--fuchsia-300)
 }
 
 .detail-row .val.amber {
-  color: #f0abfc
+  color: var(--amber-400)
 }
 
 .stack-tags {
@@ -445,7 +459,7 @@ body::after {
 
 .detail-bullets li {
   color: #fafcfc;
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   line-height: 1.7;
   padding-left: 12px;
   position: relative;
