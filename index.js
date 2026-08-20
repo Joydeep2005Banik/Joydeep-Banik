@@ -161,7 +161,6 @@ const expDetEl = $("experience-detail");
 const gitEl = $("git-heatmap");
 const gitStatEl = $("git-status");
 const clockEl = $("clock");
-const resumeModal = $("resume-modal");
 const contactModal = $("contact-modal");
 const cmdbar = $("cmdbar");
 
@@ -431,21 +430,24 @@ function tickClock() { clockEl.textContent = now(); }
 /* ═══════════════════════════════════════════════════
    MODAL
    ═══════════════════════════════════════════════════ */
-function toggleResume() {
-  modalOpen = !modalOpen;
-  resumeModal.classList.toggle("visible", modalOpen);
-}
 function toggleContact() {
   modalOpen = !modalOpen;
   contactModal.classList.toggle("visible", modalOpen);
 }
 function closeModal() {
   modalOpen = false;
-  resumeModal.classList.remove("visible");
   contactModal.classList.remove("visible");
 }
-resumeModal.addEventListener("click", e => { if (e.target === resumeModal) closeModal(); });
 contactModal.addEventListener("click", e => { if (e.target === contactModal) closeModal(); });
+
+function downloadResume() {
+  const link = document.createElement("a");
+  link.href = "Joydeep_Banik_Resume.pdf";
+  link.download = "Joydeep_Banik_Resume.pdf";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 /* ═══════════════════════════════════════════════════
    CMD BAR FLASH
@@ -505,7 +507,7 @@ document.addEventListener("keydown", e => {
     case "s":
       e.preventDefault(); toggleContact(); flash("S"); break;
     case "q":
-      e.preventDefault(); toggleResume(); flash("Q"); break;
+      e.preventDefault(); downloadResume(); flash("Q"); break;
   }
 });
 
